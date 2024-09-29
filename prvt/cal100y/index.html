@@ -9,15 +9,42 @@
 </head>
 
 <body>
-    <h1>cal100y</h1>
-    <div id="controls">
-        <label for="startYear">시작 년도:</label>
-        <input type="number" id="startYear" min="1900" max="2100" value="2024" style="width: 60px;">
-        <label for="endYear">끝 년도:</label>
-        <input type="number" id="endYear" min="1900" max="2100" value="2033" style="width: 60px;">
-        <button onclick="generateCalendar()">달력 생성</button>
+    <div id="fixed-header">
+        <h1>인생달력</h1>
+        <div id="controls">
+            <div id="center-controls">
+                <label for="startYear">시작 년도:</label>
+                <input type="number" id="startYear" min="1970" max="2050" value="1970" style="width: 60px;">
+                <label for="endYear">끝 년도:</label>
+                <input type="number" id="endYear" min="1970" max="2050" value="2050" style="width: 60px;">
+                <button onclick="generateCalendar()">달력 생성</button>
+            </div>
+            <div id="right-controls">
+                <button onclick="saveMemos()">Save</button>
+                <button onclick="openLoadPopup()">Load</button>
+            </div>
+        </div>
     </div>
-    <div id="calendar"></div>
+    <div id="content">
+        <div id="calendar"></div>
+    </div>
+
+    <div id="memo-overlay"></div>
+    <div id="memo-popup">
+        <h3 id="memo-date"></h3>
+        <textarea id="memo-text" rows="4" cols="50"></textarea>
+        <br>
+        <button onclick="saveMemo()">저장</button>
+        <button id="delete-memo" style="display: none;" onclick="deleteMemo()">삭제</button>
+        <button onclick="closeMemoPopup()">취소</button>
+    </div>
+    <div id="load-popup">
+        <h3>Load Memos</h3>
+        <textarea id="load-text" rows="4" cols="50"></textarea>
+        <br>
+        <button onclick="loadMemos()">Load</button>
+        <button onclick="closeLoadPopup()">취소</button>
+    </div>
 </body>
 <script src="index.js"></script>
 

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인생달력</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            background-color: #f0f0f0;
+        }
+        #fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #f0f0f0;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            white-space: nowrap;
+        }
+        #controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            flex-grow: 1;
+            justify-content: space-between;
+            margin-left: 20px;
+        }
+        #center-controls, #right-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #center-controls {
+            flex-grow: 1;
+            justify-content: center;
+        }
+        #right-controls {
+            margin-left: auto;
+        }
+        #content {
+            padding-top: 60px; /* 고정 헤더의 높이에 맞춰 조정 */
+        }
+        #calendar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1vw;
+        }
+        .year {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .year-title {
+            width: 100%;
+            text-align: left;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            padding-left: 5px;
+        }
+        .months-container {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .month {
+            width: calc(8.333% - 4px);
+            border: 1px solid #ddd;
+            margin: 2px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .current-year .month {
+            width: calc(16.666% - 4px);
+        }
+        .month-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1em;
+            padding: 3px 0;
+        }
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            padding: 1px;
+        }
+        .date-box {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-size: 0.7em;
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+        .date-box:hover {
+            background-color: #e0e0e0;
+        }
+        .date-box.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+        .saturday { background-color: #e6f3ff; }
+        .sunday { background-color: #ffe6e6; }
+        .today { 
+            background-color: #87CEFA !important;
+            font-weight: bold;
+            color: #000 !important;
+        }
+        .past { opacity: 0.5; }
+        .past-year {
+            background-color: #8792a3;
+            /* color: #ffffff; */
+        }
+        .past-year .saturday { background-color: #99ccff; }
+        .past-year .sunday { background-color: #ff9999; }
+        .has-memo {
+            background-color: #ffff00 !important;
+        }
+
+        .month-1, .month-2, .month-3, .month-4 { color: #000000; }
+        .month-5, .month-6, .month-7, .month-8, .month-9, .month-10, .month-11, .month-12 { color: #ffffff; }
+        .month-1 { background-color: #ffffff; }
+        .month-2 { background-color: #e6e6e6; }
+        .month-3 { background-color: #cccccc; }
+        .month-4 { background-color: #b3b3b3; }
+        .month-5 { background-color: #999999; }
+        .month-6 { background-color: #808080; }
+        .month-7 { background-color: #666666; }
+        .month-8 { background-color: #4d4d4d; }
+        .month-9 { background-color: #333333; }
+        .month-10 { background-color: #1a1a1a; }
+        .month-11 { background-color: #0d0d0d; }
+        .month-12 { background-color: #000000; }
+
+        #memo-popup, #load-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        #memo-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        @media (max-width: 1200px) { 
+            #calendar { font-size: 1.2vw; }
+        }
+        @media (max-width: 900px) {
+            #calendar { font-size: 1.4vw; }
+            .month, .current-year .month { width: calc(25% - 4px); }
+        }
+        @media (max-width: 600px) {
+            #calendar { font-size: 2vw; }
+            .month, .current-year .month { width: calc(33.333% - 4px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="fixed-header">
+        <h1>인생달력</h1>
+        <div id="controls">
+            <div id="center-controls">
+                <label for="startYear">시작 년도:</label>
+                <input type="number" id="startYear" min="1970" max="2050" value="1970" style="width: 60px;">
+                <label for="endYear">끝 년도:</label>
+                <input type="number" id="endYear" min="1970" max="2050" value="2050" style="width: 60px;">
+                <button onclick="generateCalendar()">달력 생성</button>
+            </div>
+            <div id="right-controls">
+                <button onclick="saveMemos()">Save</button>
+                <button onclick="openLoadPopup()">Load</button>
+            </div>
+        </div>
+    </div>
+    <div id="content">
+        <div id="calendar"></div>
+    </div>
+
+    <div id="memo-overlay"></div>
+    <div id="memo-popup">
+        <h3 id="memo-date"></h3>
+        <textarea id="memo-text" rows="4" cols="50"></textarea>
+        <br>
+        <button onclick="saveMemo()">저장</button>
+        <button onclick="closeMemoPopup()">취소</button>
+    </div>
+
+    <div id="load-popup">
+        <h3>Load Memos</h3>
+        <textarea id="load-text" rows="4" cols="50"></textarea>
+        <br>
+        <button onclick="loadMemos()">Load</button>
+        <button onclick="closeLoadPopup()">취소</button>
+    </div>
+
+    <script>
+        let memos = {};
+        let currentDate = '';
+
+        function generateCalendar() {
+            const startYear = parseInt(document.getElementById('startYear').value);
+            const endYear = parseInt(document.getElementById('endYear').value);
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const currentYear = today.getFullYear();
+            
+            calendar.innerHTML = '';
+
+            for (let year = startYear; year <= endYear; year++) {
+                const yearDiv = document.createElement('div');
+                yearDiv.className = 'year';
+                if (year < currentYear) {
+                    yearDiv.classList.add('past-year');
+                }
+                if (year === currentYear) {
+                    yearDiv.classList.add('current-year');
+                }
+                
+                const yearTitle = document.createElement('div');
+                yearTitle.className = 'year-title';
+                yearTitle.textContent = year;
+                yearDiv.appendChild(yearTitle);
+
+                let monthsContainer = document.createElement('div');
+                monthsContainer.className = 'months-container';
+
+                for (let month = 0; month < 12; month++) {
+                    const monthDiv = document.createElement('div');
+                    monthDiv.className = 'month';
+                    
+                    const monthTitle = document.createElement('div');
+                    monthTitle.className = `month-title month-${month + 1}`;
+                    monthTitle.textContent = `${String(month + 1).padStart(2, '0')}`;
+                    monthDiv.appendChild(monthTitle);
+
+                    const dateGrid = document.createElement('div');
+                    dateGrid.className = 'date-grid';
+
+                    const date = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0).getDate();
+
+                    let dayOfWeek = date.getDay();
+                    
+                    for (let i = 0; i < dayOfWeek; i++) {
+                        const emptyBox = document.createElement('div');
+                        emptyBox.className = 'date-box empty';
+                        dateGrid.appendChild(emptyBox);
+                    }
+
+                    for (let day = 1; day <= lastDay; day++) {
+                        const dateBox = document.createElement('div');
+                        dateBox.className = 'date-box';
+                        dateBox.textContent = day;
+
+                        const currentDate = new Date(year, month, day);
+                        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        dateBox.dataset.date = dateString;
+
+                        if (currentDate.getTime() === today.getTime()) {
+                            dateBox.classList.add('today');
+                        } else if (currentDate < today) {
+                            dateBox.classList.add('past');
+                        }
+
+                        if (dayOfWeek === 6) {
+                            dateBox.classList.add('saturday');
+                        } else if (dayOfWeek === 0) {
+                            dateBox.classList.add('sunday');
+                        }
+
+                        if (memos[dateString]) {
+                            dateBox.classList.add('has-memo');
+                        }
+
+                        dateBox.addEventListener('click', () => openMemoPopup(dateString));
+
+                        dateGrid.appendChild(dateBox);
+                        dayOfWeek = (dayOfWeek + 1) % 7;
+                    }
+
+                    monthDiv.appendChild(dateGrid);
+                    monthsContainer.appendChild(monthDiv);
+
+                    if (year === currentYear && month === 5) {
+                        yearDiv.appendChild(monthsContainer);
+                        monthsContainer = document.createElement('div');
+                        monthsContainer.className = 'months-container';
+                    }
+                }
+
+                yearDiv.appendChild(monthsContainer);
+                calendar.appendChild(yearDiv);
+            }
+        }
+
+        function openMemoPopup(date) {
+            currentDate = date;
+            document.getElementById('memo-date').textContent = `${date} 메모`;
+            document.getElementById('memo-text').value = memos[date] || '';
+            document.getElementById('memo-popup').style.display = 'block';
+            document.getElementById('memo-overlay').style.display = 'block';
+        }
+
+        function closeMemoPopup() {
+            document.getElementById('memo-popup').style.display = 'none';
+            document.getElementById('memo-overlay').style.display = 'none';
+        }
+
+        function saveMemo() {
+            const memoText = document.getElementById('memo-text').value;
+            const dateBox = document.querySelector(`.date-box[data-date="${currentDate}"]`);
+            if (dateBox) {
+                if (memoText.trim() !== '') {
+                    memos[currentDate] = memoText;
+                    dateBox.classList.add('has-memo');
+                } else {
+                    delete memos[currentDate];
+                    dateBox.classList.remove('has-memo');
+                }
+            }
+            closeMemoPopup();
+        }
+
+        function saveMemos() {
+            console.log(JSON.stringify(memos, null, 2));
+        }
+
+        function openLoadPopup() {
+            document.getElementById('load-popup').style.display = 'block';
+            document.getElementById('memo-overlay').style.display = 'block';
+        }
+
+        function closeLoadPopup() {
+            document.getElementById('load-popup').style.display = 'none';
+            document.getElementById('memo-overlay').style.display = 'none';
+        }
+
+        function loadMemos() {
+            const loadText = document.getElementById('load-text').value;
+            try {
+                const loadedMemos = JSON.parse(loadText);
+                memos = {...memos, ...loadedMemos};
+                generateCalendar();
+                closeLoadPopup();
+            } catch (error) {
+                alert('Invalid JSON format. Please check your input.');
+            }
+        }
+
+        window.onload = function() {
+            document.getElementById('startYear').value = 1970;
+            document.getElementById('endYear').value = 2050;
+            generateCalendar();
+        };
+    </script>
+</body>
+</html>
