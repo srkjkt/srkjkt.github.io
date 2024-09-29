@@ -130,8 +130,8 @@ h1 {
     background-color: #ffff00 !important;
 }
 
-.month-1, .month-2, .month-3, .month-4 { color: #000000; }
-.month-5, .month-6, .month-7, .month-8, .month-9, .month-10, .month-11, .month-12 { color: #ffffff; }
+.month-1, .month-2, .month-3, .month-4, .month-5, .month-6 { color: #000000; }
+.month-7, .month-8, .month-9, .month-10, .month-11, .month-12 { color: #ffffff; }
 .month-1 { background-color: #ffffff; }
 .month-2 { background-color: #e6e6e6; }
 .month-3 { background-color: #cccccc; }
