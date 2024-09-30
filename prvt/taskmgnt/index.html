@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TASK Manager</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');:root{--primary-color:#3498db;--secondary-color:#2c3e50;--background-color:#f7f9fc;--item-background:#fff;--border-color:#e0e0e0;--text-color:#333;--text-light:#7f8c8d}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Roboto,sans-serif;line-height:1.6;background-color:var(--background-color);color:var(--text-color)}.container{width:95%;max-width:1200px;margin:0 auto;padding:20px}h1{text-align:center;color:var(--secondary-color);margin-bottom:30px;font-size:2.5em;font-weight:500;border-bottom:2px solid var(--primary-color);padding-bottom:15px}.action-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap}#addItem{background-color:var(--primary-color);border:none;color:#fff;padding:12px 24px;text-align:center;text-decoration:none;font-size:16px;font-weight:500;cursor:pointer;border-radius:4px;transition:background-color .3s,transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.1)}#addItem:hover{background-color:#2980b9;transform:translateY(-2px)}#taskCount{font-size:16px;color:var(--text-light);font-weight:300}.item{background-color:var(--item-background);border:1px solid var(--border-color);border-radius:8px;margin-bottom:20px;padding:20px;transition:box-shadow .3s,transform .2s}.item:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-2px)}.item-grid{display:flex;align-items:center;gap:10px;margin-bottom:15px;flex-wrap:wrap}.item input[type=date],.item input[type=text],.item select{padding:8px;border:1px solid var(--border-color);border-radius:4px;font-size:14px;transition:border-color .3s}.item input[type=date]:focus,.item input[type=text]:focus,.item select:focus,.item textarea:focus{outline:0;border-color:var(--primary-color)}.item textarea{width:100%;padding:10px;border:1px solid var(--border-color);border-radius:4px;resize:vertical;min-height:80px;font-size:14px;margin-top:10px}.item input[type=text].title{flex-grow:1}.item input[type=text].link{width:120px}.item select{width:100px}.item input[type=date]{width:130px}.dropdown{position:relative;display:inline-block}.dropdown button{background-color:transparent;border:none;font-size:20px;cursor:pointer;padding:5px 10px}.dropdown-content{display:none;position:absolute;background-color:var(--item-background);min-width:160px;box-shadow:0 8px 16px 0 rgba(0,0,0,.2);z-index:1;right:0;border-radius:4px}.dropdown-content a{color:var(--text-color);padding:12px 16px;text-decoration:none;display:block;transition:background-color .3s}.dropdown-content a:hover{background-color:var(--background-color)}.show{display:block}.finished{opacity:.7}.finished input,.finished select,.finished textarea{background-color:var(--background-color);color:var(--text-light);pointer-events:none}.empty-message{text-align:center;font-size:18px;color:var(--text-light);margin-top:30px;padding:30px;background-color:var(--background-color);border-radius:8px;font-weight:300}.separator{border-top:2px solid var(--border-color);margin:30px 0;text-align:center;position:relative}.separator span{background-color:var(--background-color);padding:0 15px;position:relative;top:-14px;color:var(--text-light);font-weight:300}.drag-handle{cursor:move;padding:5px;color:var(--text-light);font-size:20px}@media (max-width:768px){.item-grid{flex-direction:column;align-items:stretch}.item input[type=date],.item input[type=text],.item select{width:100%}.action-bar{flex-direction:column;align-items:stretch}#addItem,#taskCount{width:100%;margin-bottom:10px}.item{padding:15px}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TASK Manager</h1>
+        <div class="action-bar">
+            <button id="addItem">+ Add Item</button>
+            <span id="taskCount">All Tasks: 0</span>
+        </div>
+        <div id="itemList"></div>
+    </div>
+
+    <script>
+        let items = [];
+
+        const createItem = () => ({
+            id: Date.now(),
+            title: '',
+            status: 'Wait',
+            description: '',
+            link: '',
+            date: new Date().toISOString().split('T')[0],
+            isFinished: false
+        });
+
+        const renderItem = (item) => {
+            const statuses = ['Wait', 'Analyze', 'Develop', 'Test', 'Done'];
+            const statusOptions = statuses.map(status => 
+                `<option value="${status}" ${item.status === status ? 'selected' : ''}>${status}</option>`
+            ).join('');
+
+            return `
+                <div class="item ${item.isFinished ? 'finished' : ''}" draggable="${!item.isFinished}" data-id="${item.id}">
+                    <div class="item-grid">
+                        <span class="drag-handle">≡</span>
+                        <input type="text" class="title" value="${item.title}" placeholder="Title" oninput="updateItem(${item.id}, 'title', this.value)" ${item.isFinished ? 'disabled' : ''}>
+                        <select onchange="updateItem(${item.id}, 'status', this.value)" ${item.isFinished ? 'disabled' : ''}>
+                            ${statusOptions}
+                        </select>
+                        <input type="date" value="${item.date}" onchange="updateItem(${item.id}, 'date', this.value)" ${item.isFinished ? 'disabled' : ''}>
+                        <input type="text" class="link" value="${item.link}" placeholder="Link" oninput="updateItem(${item.id}, 'link', this.value)" ${item.isFinished ? 'disabled' : ''}>
+                        <div class="dropdown">
+                            <button onclick="toggleDropdown(${item.id})">⋮</button>
+                            <div id="dropdown-${item.id}" class="dropdown-content">
+                                <a href="#" onclick="event.preventDefault(); finishItem(${item.id});">${item.isFinished ? '🔄 Unfinish' : '✅ Finish'}</a>
+                                <a href="#" onclick="event.preventDefault(); deleteItem(${item.id});">🗑 Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea placeholder="Description" oninput="updateItem(${item.id}, 'description', this.value)" ${item.isFinished ? 'disabled' : ''}>${item.description}</textarea>
+                </div>
+            `;
+        };
+
+        const renderItems = () => {
+            const itemListElement = document.getElementById('itemList');
+            const [unfinishedItems, finishedItems] = [items.filter(item => !item.isFinished), items.filter(item => item.isFinished)];
+
+            let content = unfinishedItems.length === 0 ? '<div class="empty-message">EMPTY</div>' : unfinishedItems.map(renderItem).join('');
+
+            if (finishedItems.length > 0) {
+                content += '<div class="separator"><span>Finished Items</span></div>' + finishedItems.map(renderItem).join('');
+            }
+
+            itemListElement.innerHTML = content;
+            setupDragAndDrop();
+            updateTaskCount();
+        };
+
+        const updateTaskCount = () => {
+            document.getElementById('taskCount').textContent = `All Tasks: ${items.length}`;
+        };
+
+        const addItem = () => {
+            items.push(createItem());
+            renderItems();
+        };
+
+        const updateItem = (id, field, value) => {
+            const item = items.find(item => item.id === id);
+            if (item && !item.isFinished) {
+                item[field] = value;
+            }
+        };
+
+        const toggleDropdown = (id) => {
+            document.getElementById(`dropdown-${id}`).classList.toggle("show");
+        };
+
+        const deleteItem = (id) => {
+            items = items.filter(item => item.id !== id);
+            renderItems();
+        };
+
+        const finishItem = (id) => {
+            const item = items.find(item => item.id === id);
+            if (item) {
+                item.isFinished = !item.isFinished;
+                if (item.isFinished) {
+                    item.status = 'Done';
+                    item.date = new Date().toISOString().split('T')[0];
+                }
+                renderItems();
+            }
+        };
+
+        const setupDragAndDrop = () => {
+            const itemList = document.getElementById('itemList');
+            const itemElements = itemList.getElementsByClassName('item');
+
+            Array.from(itemElements).forEach(item => {
+                if (!item.classList.contains('finished')) {
+                    item.addEventListener('dragstart', dragStart);
+                    item.addEventListener('dragover', dragOver);
+                    item.addEventListener('drop', drop);
+                    item.addEventListener('dragend', dragEnd);
+                }
+            });
+        };
+
+        const dragStart = (e) => {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            e.target.style.opacity = '0.5';
+        };
+
+        const dragOver = (e) => e.preventDefault();
+
+        const drop = (e) => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text');
+            const draggingElement = document.querySelector(`[data-id="${id}"]`);
+            const dropZone = e.target.closest('.item');
+            
+            if (draggingElement && dropZone && !dropZone.classList.contains('finished')) {
+                const tempItems = Array.from(items);
+                const [fromIndex, toIndex] = [
+                    tempItems.findIndex(item => item.id === parseInt(id)),
+                    tempItems.findIndex(item => item.id === parseInt(dropZone.dataset.id))
+                ];
+                
+                const [reorderedItem] = tempItems.splice(fromIndex, 1);
+                tempItems.splice(toIndex, 0, reorderedItem);
+                
+                items = tempItems;
+                renderItems();
+            }
+        };
+
+        const dragEnd = (e) => {
+            e.target.style.opacity = '1';
+        };
+
+        window.onclick = (event) => {
+            if (!event.target.matches('.dropdown button')) {
+                document.querySelectorAll(".dropdown-content.show").forEach(openDropdown => {
+                    openDropdown.classList.remove('show');
+                });
+            }
+        };
+
+        document.getElementById('addItem').addEventListener('click', addItem);
+        renderItems();
+    </script>
+</body>
+</html>
