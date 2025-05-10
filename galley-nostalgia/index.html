@@ -184,14 +184,16 @@
 
         .image-author {
             position: absolute;
-            top: 50%;
+            bottom: 3%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            width: 30vw;
+            transform: translateX(-50%);
+            text-align: center;
             color: white;
-            font-size: 2.2vw;
-            font-weight: bold;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-            background: rgba(0, 0, 0, 0.1);
+            font-size: 2vw;
+            font-weight: 100;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.2);
             padding: 0.1em 0.5em 0.2em 0.5em;
             border-radius: 0.85em;
             pointer-events: none;
@@ -199,8 +201,13 @@
             letter-spacing: 0.1em;
         }
 
+        #image-author-by {
+            font-size: 1.2vw;
+        }
+
         #author-name-first-char {
-            color: rgb(255, 190, 144);
+            color: rgb(255, 192, 0);
+            /* color: rgb(255, 255, 255); */
         }
     </style>
 </head>
@@ -232,7 +239,7 @@
                 <img src="./1/56x41 nostalgia 1 Acrylic on Canvas 2017.jpg" alt="Gallery Image 5" class="gallery-image"
                     data-index="4">
                 <!-- 작가 이름 -->
-                <div class="image-author">by <span id="author-name-first-char">K</span>IM <span
+                <div class="image-author"><span id="image-author-by">by</span> <span id="author-name-first-char">K</span>IM <span
                         id="author-name-first-char">T</span>AEHWA</div>
             </div>
 
@@ -241,6 +248,17 @@
             <button class="nav-button prev-button">←</button>
             <button class="nav-button next-button">→</button>
             -->
+        </div>
+
+        <!-- 콘텐츠 섹션 -->
+        <div class="content-section">
+            <h2>Introduction</h2>
+                <h3>작가노트</h3>
+                <br />
+                <p>나의 그림은 내면의 그리움과 현실의 소통이다.</p>
+                <p>경험은 특별한 이미지를 담게 하고 시간은 그것을 그리워한다.</p>
+                <p>이성보다는 감성에 물 들은 지천명(知天命)이 된 지금 경험에 의해 내재되었던 이미지들이 재료나 색감으로 선택되어 표현되고 있다. 내가 표현하려는 이미지나 소재들은 내 삶의 경험이고 기억이고 그리움이며 이야기들인 것이다. 풀이나 달, 소나무, 곤충들, 여기에 간절한 소망이 포함되어 삶의 이야기로 그려지고 있는 것이다. 내 그림을 보는 다른 관찰자도 본인의 그리운 경험의 이야기들을 끄집어내 유년시절의 일기를 완성할 것이다.</p>
+                <p>우리들은 센 바람이 불어 현실이 힘들수록 그리움만 커져간다.</p>
         </div>
 
         <!-- 콘텐츠 섹션 -->
