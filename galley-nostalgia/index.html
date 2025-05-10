@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,8 +26,10 @@
         .image-section {
             position: relative;
             /* background-color: #000; */
+            background: radial-gradient(circle at center, rgba(128, 128, 128, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
             overflow: hidden;
-            height: 80vh; /* 화면 높이의 80% */
+            height: 80vh;
+            /* 화면 높이의 80% */
         }
 
         .logo {
@@ -34,7 +37,8 @@
             top: 20px;
             left: 20px;
             z-index: 100;
-            width: 150px;
+            /* width: 150px; */
+            width: 25%;
             height: auto;
         }
 
@@ -47,20 +51,38 @@
 
         .gallery-image {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             opacity: 0;
             transition: opacity 0.8s ease-in-out;
+            /* Ken Burns 효과 기본값 */
+            transform: scale(1.03) translateX(-2%) translateY(-2%);
+            transition-property: opacity, transform;
+            transition-duration: 0.8s, 18s;
+            /* opacity는 0.8초, transform은 18초 */
+            transition-timing-function: ease-in-out, linear;
         }
 
         .gallery-image.active {
             opacity: 1;
+        }
+
+        /* Ken Burns 효과: 천천히 이동 및 확대 */
+        .gallery-image.kenburns-in {
+            transform: scale(1.05) translateX(2%) translateY(2%);
+            transition-property: opacity, transform;
+            transition-duration: 0.8s, 18s;
+            transition-timing-function: ease-in-out, linear;
+        }
+
+        .gallery-image.kenburns-out {
+            transform: scale(1.02) translateX(-3%) translateY(-3%);
+            transition-property: opacity, transform;
+            transition-duration: 0.8s, 18s;
+            transition-timing-function: ease-in-out, linear;
         }
 
         /* Canvas 영역 */
@@ -118,9 +140,9 @@
         .content-placeholder {
             height: 300px;
             background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
-                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
-                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
-                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+                linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+                linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
             border: 1px dashed #ccc;
@@ -159,36 +181,68 @@
             font-size: 20px;
             z-index: 80;
         }
+
+        .image-author {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2.2vw;
+            font-weight: bold;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.1em 0.5em 0.2em 0.5em;
+            border-radius: 0.85em;
+            pointer-events: none;
+            z-index: 120;
+            letter-spacing: 0.1em;
+        }
+
+        #author-name-first-char {
+            color: rgb(255, 190, 144);
+        }
     </style>
 </head>
+
 <body>
     <div class="gallery-container">
         <!-- 이미지 섹션 -->
         <div class="image-section">
             <!-- 로고 -->
-            <img src="./Gallery-nostalgia-caligraphy.png" alt="갤러리 노스탤지아 로고" class="logo">
-            
+            <img src="./Gallery-nostalgia-caligraphy-gold-shadow.png" alt="갤러리 노스탤지아 로고" class="logo">
+
             <!-- 로딩 표시 -->
             <div class="loading">로딩 중...</div>
-            
+
             <!-- 이미지 래퍼 -->
             <div class="image-wrapper">
                 <!-- Canvas 영역 -->
                 <canvas id="effect-canvas"></canvas>
-                
+
                 <!-- 이미지들 (샘플 이미지 5개) -->
-                <img src="./1/100x100 nostalgia 1 Acrylic on Canvas 2020.jpg" alt="Gallery Image 1" class="gallery-image active" data-index="0">
-                <img src="./1/100x25 nostalgia 1 Oil on Canvas 2020.jpg" alt="Gallery Image 2" class="gallery-image" data-index="1">
-                <img src="./1/135x35 nostalgia 1 Oil on canvas 2019.jpg" alt="Gallery Image 3" class="gallery-image" data-index="2">
-                <img src="./1/25.5x17.5 nostalgia 1 Acrylic on Canvas 2022.jpg" alt="Gallery Image 4" class="gallery-image" data-index="3">
-                <img src="./1/56x41 nostalgia 1 Acrylic on Canvas 2017.jpg" alt="Gallery Image 5" class="gallery-image" data-index="4">
+                <img src="./1/100x100 nostalgia 1 Acrylic on Canvas 2020.jpg" alt="Gallery Image 1"
+                    class="gallery-image active" data-index="0">
+                <img src="./1/100x25 nostalgia 1 Oil on Canvas 2020.jpg" alt="Gallery Image 2" class="gallery-image"
+                    data-index="1">
+                <img src="./1/135x35 nostalgia 1 Oil on canvas 2019.jpg" alt="Gallery Image 3" class="gallery-image"
+                    data-index="2">
+                <img src="./1/25.5x17.5 nostalgia 1 Acrylic on Canvas 2022.jpg" alt="Gallery Image 4"
+                    class="gallery-image" data-index="3">
+                <img src="./1/56x41 nostalgia 1 Acrylic on Canvas 2017.jpg" alt="Gallery Image 5" class="gallery-image"
+                    data-index="4">
+                <!-- 작가 이름 -->
+                <div class="image-author">by <span id="author-name-first-char">K</span>IM <span
+                        id="author-name-first-char">T</span>AEHWA</div>
             </div>
-            
+
             <!-- 네비게이션 버튼 -->
+            <!-- 
             <button class="nav-button prev-button">←</button>
             <button class="nav-button next-button">→</button>
+            -->
         </div>
-        
+
         <!-- 콘텐츠 섹션 -->
         <div class="content-section">
             <h2>이미지 갤러리</h2>
@@ -196,7 +250,7 @@
                 여기에 추가 기능이 들어갈 예정입니다
             </div>
         </div>
-        
+
         <!-- 푸터 -->
         <footer class="footer">
             <h3>갤러리 소개</h3>
@@ -229,14 +283,25 @@
             if (isTransitioning) return;
             isTransitioning = true;
 
-            // 모든 이미지 숨기기
-            images.forEach(img => img.classList.remove('active'));
-            
-            // 선택된 이미지 표시
+            // 모든 이미지에서 효과 클래스 제거
+            images.forEach(img => {
+                img.classList.remove('active', 'kenburns-in', 'kenburns-out');
+            });
+
+            // 이전 이미지에 kenburns-out 적용
+            const prevImg = images[currentIndex];
+            prevImg.classList.add('kenburns-out');
+
+            // 새 이미지에 active, kenburns-in 적용
+            const nextImg = images[index];
             setTimeout(() => {
-                images[index].classList.add('active');
+                nextImg.classList.add('active', 'kenburns-in');
                 currentIndex = index;
-                isTransitioning = false;
+                // 효과가 끝나면 kenburns-in 제거(다음 전환을 위해)
+                setTimeout(() => {
+                    nextImg.classList.remove('kenburns-in');
+                    isTransitioning = false;
+                }, 18000); // transform 애니메이션 시간과 맞춤(18초)
             }, 100);
         }
 
@@ -266,17 +331,17 @@
         }
 
         // 이벤트 리스너
-        document.querySelector('.next-button').addEventListener('click', nextImage);
-        document.querySelector('.prev-button').addEventListener('click', prevImage);
+        // document.querySelector('.next-button').addEventListener('click', nextImage);
+        // document.querySelector('.prev-button').addEventListener('click', prevImage);
 
-        // 키보드 이벤트 (화살표 키)
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                nextImage();
-            } else if (e.key === 'ArrowLeft') {
-                prevImage();
-            }
-        });
+        // // 키보드 이벤트 (화살표 키)
+        // document.addEventListener('keydown', (e) => {
+        //     if (e.key === 'ArrowRight' || e.key === ' ') {
+        //         nextImage();
+        //     } else if (e.key === 'ArrowLeft') {
+        //         prevImage();
+        //     }
+        // });
 
         // 이미지 로딩 이벤트
         images.forEach(img => {
@@ -291,6 +356,7 @@
         // 초기화
         window.addEventListener('load', () => {
             resizeCanvas();
+            images[0].classList.add('kenburns-in'); // 첫 이미지에 효과 적용
             startAutoSlide();
         });
 
@@ -376,4 +442,5 @@
         */
     </script>
 </body>
+
 </html>
