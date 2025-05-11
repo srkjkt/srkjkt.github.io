@@ -116,14 +116,6 @@
             background: rgba(255, 255, 255, 0.5);
         }
 
-        .prev-button {
-            left: 20px;
-        }
-
-        .next-button {
-            right: 20px;
-        }
-
         /* 스크롤 영역 */
         .content-section {
             min-height: 500px;
@@ -209,6 +201,12 @@
             color: rgb(255, 192, 0);
             /* color: rgb(255, 255, 255); */
         }
+
+        .sky {
+            height: 100%;
+            color: #FFF;
+            display: block;
+        }
     </style>
 </head>
 
@@ -223,42 +221,45 @@
             <div class="loading">로딩 중...</div>
 
             <!-- 이미지 래퍼 -->
-            <div class="image-wrapper">
-                <!-- Canvas 영역 -->
-                <canvas id="effect-canvas"></canvas>
+            <section class="sky">
+                <div class="image-wrapper">
+                    <!-- Canvas 영역 -->
 
-                <!-- 이미지들 (샘플 이미지 5개) -->
-                <img src="./1/100x100 nostalgia 1 Acrylic on Canvas 2020.jpg" alt="Gallery Image 1"
-                    class="gallery-image active" data-index="0">
-                <img src="./1/100x25 nostalgia 1 Oil on Canvas 2020.jpg" alt="Gallery Image 2" class="gallery-image"
-                    data-index="1">
-                <img src="./1/135x35 nostalgia 1 Oil on canvas 2019.jpg" alt="Gallery Image 3" class="gallery-image"
-                    data-index="2">
-                <img src="./1/25.5x17.5 nostalgia 1 Acrylic on Canvas 2022.jpg" alt="Gallery Image 4"
-                    class="gallery-image" data-index="3">
-                <img src="./1/56x41 nostalgia 1 Acrylic on Canvas 2017.jpg" alt="Gallery Image 5" class="gallery-image"
-                    data-index="4">
-                <!-- 작가 이름 -->
-                <div class="image-author"><span id="image-author-by">by</span> <span id="author-name-first-char">K</span>IM <span
-                        id="author-name-first-char">T</span>AEHWA</div>
-            </div>
+                    <!-- <canvas id="effect-canvas"></canvas> -->
 
-            <!-- 네비게이션 버튼 -->
-            <!-- 
-            <button class="nav-button prev-button">←</button>
-            <button class="nav-button next-button">→</button>
-            -->
+                    <!-- 이미지들 (샘플 이미지 5개) -->
+                    <img src="./1/100x100 nostalgia 1 Acrylic on Canvas 2020.jpg" alt="Gallery Image 1"
+                        class="gallery-image active" data-index="0">
+                    <img src="./1/100x25 nostalgia 1 Oil on Canvas 2020.jpg" alt="Gallery Image 2" class="gallery-image"
+                        data-index="1">
+                    <img src="./1/135x35 nostalgia 1 Oil on canvas 2019.jpg" alt="Gallery Image 3" class="gallery-image"
+                        data-index="2">
+                    <img src="./1/25.5x17.5 nostalgia 1 Acrylic on Canvas 2022.jpg" alt="Gallery Image 4"
+                        class="gallery-image" data-index="3">
+                    <img src="./1/56x41 nostalgia 1 Acrylic on Canvas 2017.jpg" alt="Gallery Image 5"
+                        class="gallery-image" data-index="4">
+                    <!-- 작가 이름 -->
+                    <div class="image-author"><span id="image-author-by">by</span> <span
+                            id="author-name-first-char">K</span>IM <span id="author-name-first-char">T</span>AEHWA</div>
+                </div>
+            </section>
         </div>
 
         <!-- 콘텐츠 섹션 -->
         <div class="content-section">
             <h2>Introduction</h2>
-                <h3>작가노트</h3>
-                <br />
+            <h3>작가노트</h3>
+            <br />
+            <div>
                 <p>나의 그림은 내면의 그리움과 현실의 소통이다.</p>
+                <br />
                 <p>경험은 특별한 이미지를 담게 하고 시간은 그것을 그리워한다.</p>
-                <p>이성보다는 감성에 물 들은 지천명(知天命)이 된 지금 경험에 의해 내재되었던 이미지들이 재료나 색감으로 선택되어 표현되고 있다. 내가 표현하려는 이미지나 소재들은 내 삶의 경험이고 기억이고 그리움이며 이야기들인 것이다. 풀이나 달, 소나무, 곤충들, 여기에 간절한 소망이 포함되어 삶의 이야기로 그려지고 있는 것이다. 내 그림을 보는 다른 관찰자도 본인의 그리운 경험의 이야기들을 끄집어내 유년시절의 일기를 완성할 것이다.</p>
+                <p>이성보다는 감성에 물 들은 지천명(知天命)이 된 지금 경험에 의해 내재되었던 이미지들이 재료나 색감으로 선택되어 표현되고 있다.</p>
+                <p>내가 표현하려는 이미지나 소재들은 내 삶의 경험이고 기억이고 그리움이며 이야기들인 것이다.</p>
+                <p>풀이나 달, 소나무, 곤충들, 여기에 간절한 소망이 포함되어 삶의 이야기로 그려지고 있는 것이다.</p>
+                <p>내 그림을 보는 다른 관찰자도 본인의 그리운 경험의 이야기들을 끄집어내 유년시절의 일기를 완성할 것이다.</p>
                 <p>우리들은 센 바람이 불어 현실이 힘들수록 그리움만 커져간다.</p>
+            </div>
         </div>
 
         <!-- 콘텐츠 섹션 -->
@@ -287,14 +288,6 @@
         let isTransitioning = false;
         const images = document.querySelectorAll('.gallery-image');
         const totalImages = images.length;
-        const canvas = document.getElementById('effect-canvas');
-        const ctx = canvas.getContext('2d');
-
-        // Canvas 리사이즈
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight * 0.8;
-        }
 
         // 이미지 전환 함수
         function showImage(index) {
@@ -330,13 +323,6 @@
             showImage(nextIndex);
         }
 
-        // 이전 이미지
-        function prevImage() {
-            resetAutoSlide();
-            const prevIndex = (currentIndex - 1 + totalImages) % totalImages;
-            showImage(prevIndex);
-        }
-
         // 자동 슬라이드 시작
         function startAutoSlide() {
             autoSlideInterval = setInterval(nextImage, 5000); // 5초마다 자동 전환
@@ -348,117 +334,20 @@
             startAutoSlide();
         }
 
-        // 이벤트 리스너
-        // document.querySelector('.next-button').addEventListener('click', nextImage);
-        // document.querySelector('.prev-button').addEventListener('click', prevImage);
-
-        // // 키보드 이벤트 (화살표 키)
-        // document.addEventListener('keydown', (e) => {
-        //     if (e.key === 'ArrowRight' || e.key === ' ') {
-        //         nextImage();
-        //     } else if (e.key === 'ArrowLeft') {
-        //         prevImage();
-        //     }
-        // });
-
         // 이미지 로딩 이벤트
         images.forEach(img => {
             img.addEventListener('load', () => {
                 document.querySelector('.loading').style.display = 'none';
             });
         });
-
-        // 윈도우 리사이즈
-        window.addEventListener('resize', resizeCanvas);
-
         // 초기화
         window.addEventListener('load', () => {
-            resizeCanvas();
             images[0].classList.add('kenburns-in'); // 첫 이미지에 효과 적용
             startAutoSlide();
         });
-
-        /*
-        // 효과 변수
-        let time = 0;
-
-        // Canvas 효과 그리기
-        function drawEffect() {
-            // 전체 캔버스 클리어
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // 시간 업데이트
-            time += 0.01;
-            
-            // 격자 패턴 그리기 (레이아웃 테스트용)
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
-            
-            // 세로선
-            for (let x = 0; x < canvas.width; x += 50) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-            
-            // 가로선
-            for (let y = 0; y < canvas.height; y += 50) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-            
-            // 중앙 십자 가이드라인
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
-            ctx.lineWidth = 2;
-            
-            // 수직 중앙선
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.stroke();
-            
-            // 수평 중앙선
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.stroke();
-            
-            // 움직이는 원들 (레이어 효과 테스트)
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            for (let i = 0; i < 5; i++) {
-                const radius = 20 + i * 10;
-                const x = canvas.width / 2 + Math.cos(time + i) * (50 + i * 20);
-                const y = canvas.height / 2 + Math.sin(time + i) * (50 + i * 20);
-                
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // 이미지 번호 표시
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.font = '24px Arial';
-            ctx.fillText(`이미지 ${currentIndex + 1}/${totalImages}`, 20, canvas.height - 20);
-            
-            // 이미지 전환 플래시 효과
-            if (isTransitioning) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // 애니메이션 루프
-        function animate() {
-            drawEffect();
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-        */
     </script>
+
+    <script src="./snow.js"></script>
 </body>
 
 </html>
